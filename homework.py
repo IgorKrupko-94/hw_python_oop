@@ -79,7 +79,8 @@ class Running(Training):
         coeff_mult_speed: int = 18
         coeff_diff_speed: int = 20
         return ((coeff_mult_speed * self.get_mean_speed() - coeff_diff_speed)
-               * self.weight / self.M_IN_KM * self.duration * self.H_IN_MIN)
+                 * self.weight / self.M_IN_KM * self.duration * self.H_IN_MIN
+                )
 
 
 class SportsWalking(Training):
@@ -101,9 +102,9 @@ class SportsWalking(Training):
         coeff_square_speed: int = 2
         coeff_mult_div: float = 0.029
         return ((coeff_mult_weight * self.weight
-                 + (self.get_mean_speed() ** coeff_square_speed // self.height)
-                 * coeff_mult_div * self.weight) * self.duration
-                 * self.H_IN_MIN
+                + (self.get_mean_speed() ** coeff_square_speed // self.height)
+                * coeff_mult_div * self.weight) * self.duration
+                * self.H_IN_MIN
                 )
 
 
@@ -127,15 +128,15 @@ class Swimming(Training):
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения."""
         return (self.length_pool * self.count_pool
-              / self.M_IN_KM / self.duration
+                / self.M_IN_KM / self.duration
                 )
-    
+
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         coeff_add_speed: float = 1.1
         coeff_mult_weight: int = 2
         return ((self.get_mean_speed() + coeff_add_speed)
-                 * coeff_mult_weight * self.weight
+                * coeff_mult_weight * self.weight
                 )
 
 
@@ -146,6 +147,7 @@ def read_package(workout_type: str, data: list) -> Training:
                         'SWM': Swimming
                         }
     return types_of_workout[workout_type](*data)
+
 
 def main(training: Training) -> None:
     """Главная функция."""
@@ -163,4 +165,3 @@ if __name__ == '__main__':
     for workout_type, data in packages:
         training = read_package(workout_type, data)
         main(training)
-
