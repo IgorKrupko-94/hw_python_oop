@@ -79,7 +79,7 @@ class Running(Training):
         coeff_mult_speed: int = 18
         coeff_diff_speed: int = 20
         return ((coeff_mult_speed * self.get_mean_speed() - coeff_diff_speed)
-                 * self.weight / self.M_IN_KM * self.duration * self.H_IN_MIN
+                * self.weight / self.M_IN_KM * self.duration * self.H_IN_MIN
                 )
 
 
