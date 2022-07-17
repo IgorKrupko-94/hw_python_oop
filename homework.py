@@ -1,3 +1,6 @@
+from dataclasses import dataclass, asdict
+
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
     training_type: str
@@ -5,32 +8,16 @@ class InfoMessage:
     distance: float
     speed: float
     calories: float
-
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float
-                 ) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+    RESULT_TRAINING: str = ('Тип тренировки: {training_type}; '
+                            'Длительность: {duration:.3f} ч.; '
+                            'Дистанция: {distance:.3f} км; '
+                            'Ср. скорость: {speed:.3f} км/ч; '
+                            'Потрачено ккал: {calories:.3f}.'
+                            )
 
     def get_message(self) -> str:
         """Вернуть сообщение о выполненной тренировке."""
-        round_duration: float = f'{self.duration:.3f}'
-        round_distance: float = f'{self.distance:.3f}'
-        round_speed: float = f'{self.speed:.3f}'
-        round_calories: float = f'{self.calories:.3f}'
-        return (f'Тип тренировки: {self.training_type}; '
-                f'Длительность: {round_duration} ч.; '
-                f'Дистанция: {round_distance} км; '
-                f'Ср. скорость: {round_speed} км/ч; '
-                f'Потрачено ккал: {round_calories}.'
-                )
+        return self.RESULT_TRAINING.format(**asdict(self))
 
 
 class Training:
@@ -61,7 +48,9 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError('Переопределите метод get_spent_calories в '
+                                  + str(type(self).__name__)
+                                  )
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -76,9 +65,9 @@ class Training:
 class Running(Training):
     """Тренировка: бег."""
     def get_spent_calories(self) -> float:
-        coeff_mult_speed: int = 18
-        coeff_diff_speed: int = 20
-        return ((coeff_mult_speed * self.get_mean_speed() - coeff_diff_speed)
+        COEFF_1_SPEED_RUN: int = 18
+        COEFF_2_SPEED_RUN: int = 20
+        return ((COEFF_1_SPEED_RUN * self.get_mean_speed() - COEFF_2_SPEED_RUN)
                 * self.weight / self.M_IN_KM * self.duration * self.H_IN_MIN
                 )
 
@@ -98,12 +87,12 @@ class SportsWalking(Training):
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        coeff_mult_weight: float = 0.035
-        coeff_square_speed: int = 2
-        coeff_mult_div: float = 0.029
-        return ((coeff_mult_weight * self.weight
-                + (self.get_mean_speed() ** coeff_square_speed // self.height)
-                * coeff_mult_div * self.weight) * self.duration
+        COEFF_MULT_1_WALK: float = 0.035
+        COEFF_SQUARE_WALK: int = 2
+        COEFF_MULT_2_WALK: float = 0.029
+        return ((COEFF_MULT_1_WALK * self.weight
+                + (self.get_mean_speed() ** COEFF_SQUARE_WALK // self.height)
+                * COEFF_MULT_2_WALK * self.weight) * self.duration
                 * self.H_IN_MIN
                 )
 
@@ -133,10 +122,10 @@ class Swimming(Training):
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        coeff_add_speed: float = 1.1
-        coeff_mult_weight: int = 2
-        return ((self.get_mean_speed() + coeff_add_speed)
-                * coeff_mult_weight * self.weight
+        COEFF_ADD_SWIM: float = 1.1
+        COEFF_MULT_SWIM: int = 2
+        return ((self.get_mean_speed() + COEFF_ADD_SWIM)
+                * COEFF_MULT_SWIM * self.weight
                 )
 
 
@@ -146,6 +135,9 @@ def read_package(workout_type: str, data: list) -> Training:
                         'WLK': SportsWalking,
                         'SWM': Swimming
                         }
+    workout_get_type = types_of_workout.get(workout_type)
+    if not workout_get_type:
+        raise ValueError('Задайте корректный тип тренировки')
     return types_of_workout[workout_type](*data)
 
 
